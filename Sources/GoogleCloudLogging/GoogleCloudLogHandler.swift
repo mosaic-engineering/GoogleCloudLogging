@@ -212,9 +212,7 @@ public struct GoogleCloudLogHandler: LogHandler {
         upload()
         
         DispatchQueue.main.async { // Async in case setup before LoggingSystem bootstrap.
-            if isFirstSetup {
-                logger.info("GoogleCloudLogHandler has been setup", metadata: [MetadataKey.serviceAccountCredentials: "\(url)", MetadataKey.logFile: "\(logFile)"])
-            } else {
+            if !isFirstSetup {
                 logger.warning("Repeated setup of GoogleCloudLogHandler", metadata: [MetadataKey.serviceAccountCredentials: "\(url)", MetadataKey.logFile: "\(logFile)"])
                 fileHandleQueue.async { // Assert in fileHandleQueue so warning is saved.
                     assertionFailure("App should only setup GoogleCloudLogHandler once")
@@ -389,7 +387,7 @@ public struct GoogleCloudLogHandler: LogHandler {
                     fileHandleQueue.async {
                         switch result {
                         case .success:
-                            logger.info("Logs have been uploaded")
+                            NSLog("GoogleCloudLogging: Logs have been uploaded!")
                             deleteOldEntries()
                         case .failure(let error):
                             switch error {
